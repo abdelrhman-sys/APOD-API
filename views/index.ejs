@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Astronomy Picture</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <link href="/style.css" rel="stylesheet">
+</head>
+<body>
+    <h1>Welcome to APOD <span>"Astronomy Picture Of a Day"</span></h1>
+    <fieldset class="search-type">
+        <h2>Select type of search:</h2>
+        <!-- <h2>Select type of search: </h2> -->
+        <div>
+            <input type="radio" id="s1" name="radio"/>
+            <label for="s1">range date</label>
+        </div>
+        <div>
+            <input type="radio" id="s2" name="radio"/>
+            <label for="s2">specific date</label>
+        </div>
+        <div>
+            <input type="radio" id="s3" name="radio"/>
+            <label for="s3">random</label>
+        </div>
+    </fieldset>
+
+    <form method="post" action="/range">
+        <fieldset class="range-spec range-random disabled" id="range-field">
+            <div id="range">
+                <div class="f-date">
+                    <p><i>First Date </i></p>
+                    <label for="fyear">Enter year: </label>
+                    <input type="number" name="fyear" id="fyear" placeholder="e.g.: 2005" required>
+                    <label for="fmonth">Enter month: </label>
+                    <input type="number" name="fmonth" id="fmonth" placeholder="e.g.: 5" required>
+                    <label for="fday">Enter day: </label>
+                    <input type="number" name="fday" id="fday" placeholder="e.g.: 24" required>
+                </div>
+                <hr>
+                <div class="s-date">
+                    <p><i>Second Date </i></p>
+                    <label for="syear">Enter year: </label>
+                    <input type="number" name="syear" id="syear" placeholder="e.g.: 2022">
+                    <label for="smonth">Enter month: </label>
+                    <input type="number" name="smonth" id="smonth" placeholder="e.g.: 3">
+                    <label for="sday">Enter day: </label>
+                    <input type="number" name="sday" id="sday" placeholder="e.g.: 26">
+                    <p><em>(today is defualt)</em></p>
+                </div>
+                <input type="submit" value="GO" id="go-range">
+            </div>
+        </fieldset>
+    </form>
+    <form method="post" action="/spec">
+        <fieldset class="range-spec spec-random disabled" id="spec-field">
+            <div id="spec">
+                <label for="year">Enter year: </label>
+                <input type="number" name="year" id="year" placeholder="e.g.: 2006" required>
+                <label for="month">Enter month: </label>
+                <input type="number" name="month" id="month" placeholder="e.g.: 3" required>
+                <label for="day">Enter day: </label>
+                <input type="number" name="day" id="day" placeholder="e.g.: 18" required>
+                <input type="submit" value="GO" >
+            </div>
+        </fieldset>
+    </form>
+    <form method="post" action="/random">
+        <div class="spec-random range-random disabled m-3" id="random">
+            <label for="random-num">random number: </label>
+            <input type="number" name="random" id="random-num" placeholder="e.g.: 3" required>
+            <br>
+            <input type="submit" value="GO">
+        </div>
+    </form>
+    <% if (locals.data) { %>
+        <!-- range or random -->
+        <div class="card-array">
+            <% for (let i = 0; i < data.length; i++) { %>
+                <div class="card">
+                    <a href="<%= data[i].hdurl || data[i].thumbnail_url %>"><img src="<%= data[i].hdurl || data[i].thumbnail_url %>" class="card-img-top" alt="Astronomy Picture"></a>
+                    <div class="card-body">
+                        <h4 class="card-title"><%= data[i].title %></h5>
+                        <p class="card-text"><%= data[i].explanation %></p>
+                        <p class="card-date"><%= data[i].date %></p>
+                    </div>
+                </div>
+            <% } %>  
+        </div>
+    <% }else if(locals.dataOb) {%> 
+        <!-- specific -->
+        <div class="card-ob">
+            <div class="card">
+                <a href="<%= dataOb.hdurl || dataOb.thumbnail_url %>"><img src="<%= dataOb.hdurl || dataOb.thumbnail_url %>" class="card-img-top" alt="Astronomy Picture"></a>
+                <div class="card-body">
+                    <h4 class="card-title"><%= dataOb.title %></h5>
+                    <p class="card-text"><%= dataOb.explanation %></p>
+                    <p class="card-date"><%= dataOb.date %></p>
+                </div>
+            </div>
+        </div>
+    <% }else{ %>
+        <h3>🚀🚀🚀</h3>
+        <% if (locals.error) { %>
+            <p class="error">error: <%= error %></p>
+        <% }%>
+    <% } %>
+
+    <footer>
+        <div class="d-flex flex-sm-row justify-content-center py-4 my-4 border-top">
+            <p>© APOD API, All rights reserved.</p>
+        </div>
+    </footer>
+    <script charset="UTF-8">
+        document.querySelector("#s1").addEventListener("click", ()=> {
+            for (let i = 0; i < 2; i++) {
+                document.querySelectorAll(".spec-random")[i].classList.add("disabled");
+            }
+            document.querySelector("#range-field").classList.remove("disabled");
+        });
+        document.querySelector("#s2").addEventListener("click", ()=> {
+            for (let i = 0; i < 2; i++) {
+                document.querySelectorAll(".range-random")[i].classList.add("disabled");
+            }
+            document.querySelector("#spec-field").classList.remove("disabled");
+        });
+        document.querySelector("#s3").addEventListener("click", ()=> {
+            for (let i = 0; i < 2; i++) {
+                document.querySelectorAll(".range-spec")[i].classList.add("disabled");
+            }
+            document.querySelector("#random").classList.remove("disabled");
+        });
+    </script>
+</body>
+</html>
