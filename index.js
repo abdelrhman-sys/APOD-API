@@ -14,19 +14,19 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.post("/range", async(req, res)=> {
     try {
-        const response = await axios.get(base_url, {
-            params: {
-                api_key: key,
-                start_date: `${req.body.fyear}-${req.body.fmonth}-${req.body.fday}`,
-                end_date: endDate(),
-                thumbs: true,
-            }
-        }); 
-        function endDate() {
+        function endDate(params) {
             if (req.body.sday !== "" && req.body.syear !== "" && req.body.smonth !== "") {
                 params.end_date = `${req.body.syear}-${req.body.smonth}-${req.body.sday}`;
             }
         }
+        const params = {
+            api_key: key,
+            start_date: `${req.body.fyear}-${req.body.fmonth}-${req.body.fday}`,
+            thumbs: true,
+        };
+        endDate(params);
+        
+        const response = await axios.get(base_url, { params }); 
         res.render("index.ejs", {data: response.data}); // as an array
     } catch (error) {
         let errorMsg = await error.response.data.msg;
