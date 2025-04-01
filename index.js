@@ -2,22 +2,24 @@ import express from "express";
 import axios from "axios";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
-import path from "path";
-import { fileURLToPath } from "url";
+import { fileURLToPath } from 'url';
+import path from 'path';
+import ejs from "ejs";
 
-dotenv.config();
-// Get __dirname in ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+dotenv.config();
 
 const app = express();
 const key = process.env.KEY;
 const base_url = "https://api.nasa.gov/planetary/apod";
 
-app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "views"));
+app.engine('ejs', ejs.renderFile);  // Register the EJS engine
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 
-app.use(express.static("public"));
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.post("/range", async(req, res)=> {
@@ -67,6 +69,13 @@ app.post("/random", async(req, res)=> {
 });
 app.get("/", (req, res)=> {
     res.render("index.ejs");
+});
+app.get('/favicon.ico', (req, res) => res.status(204).end());// ignore favicon in vercel
+app.get('/favicon.png', (req, res) => res.status(204).end());
+//temporarily to verify file serving
+app.get('/debug-css', (req, res) => {
+    const cssPath = path.join(__dirname, 'public', 'index.css');
+    res.sendFile(cssPath);
 });
 app.listen(3000, ()=> {
     console.log("listening on port 3000");
